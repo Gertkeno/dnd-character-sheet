@@ -22,6 +22,11 @@ pub fn pick_a_number(max: u8) !u8 {
             return PickError.QUIT;
         }
 
+        if (line[0] == '-') {
+            try stdout.print("Clearly there are no negative numbers here, what is wrong with you?\n", .{});
+            continue :outer;
+        }
+
         var num: usize = 0;
         for (line) |it| {
             if (it > '9' or it < '0') {
@@ -34,7 +39,7 @@ pub fn pick_a_number(max: u8) !u8 {
 
         if (num > max or num == 0) {
             try stdout.print("Invalid number \"{}\", q to exit\n", .{num});
-            continue;
+            continue :outer;
         } else {
             return @truncate(u8, num - 1);
         }

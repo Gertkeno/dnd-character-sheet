@@ -42,19 +42,79 @@ fn _pick_level() bool {
     return true;
 }
 
-fn _base_stats() bool {
+fn _pick_base_stats() bool {
+    var rng = std.rand.DefaultPrng.init(@intCast(u64, std.time.milliTimestamp())).random;
+    var totals: [6]u8 = undefined;
+
+    for (totals) |*tstat| {
+        stdout.print("rolled: ", .{}) catch return false;
+        var stubRolls: [4]u8 = [4]u8{ 0, 0, 0, 0 };
+
+        var total: u8 = 0;
+        var lowest: u8 = 6;
+        for (stubRolls) |*it| {
+            it.* = rng.uintLessThan(u8, 6) + 1;
+            stdout.print("{},", .{it.*}) catch return false;
+            total += it.*;
+            if (it.* < lowest) {
+                lowest = it.*;
+            }
+        }
+
+        stdout.print("\tvalue: {}\n", .{total - lowest}) catch return false;
+        tstat.* = total - lowest;
+    }
+    character.stats = totals;
+    stdout.print("Assigning stats in that order, please reorder manually!\n\n", .{}) catch return false;
+
+    return true;
+}
+
+fn gr(comptime T: type, l: T, r: T) bool {
+    return l > r;
+}
+
+fn _reorder_base_stats() bool {
+    var cstats: [6]u8 = character.stats;
+    var rplstats: [6]u8 = character.stats;
+
+    std.sort.sort(u8, &cstats, u8, gr);
+
+    var pickableStat: [6]bool = [_]bool{true} ** 6;
+    for (cstats) |t| {
+        // backup incase slot is take/failed choice
+        while (true) {
+            stdout.print("placing stat: {}...\n", .{t}) catch return false;
+            for (pickableStat) |ps, n| {
+                const tn = @tagName(@intToEnum(Core_Stat_t, @truncate(u8, n)));
+                stdout.print("{c}. {}\n", .{ if (ps) '0' + @intCast(u8, n) + 1 else 'x', tn }) catch return false;
+            }
+
+            const slot = pick_a_number(6) catch return false;
+            if (pickableStat[slot]) {
+                rplstats[slot] = t;
+                pickableStat[slot] = false;
+                break;
+            } else {
+                stdout.print("Slot {} already taken\n", .{slot + 1}) catch return false;
+            }
+        }
+    }
+
+    character.stats = rplstats;
+
     return true;
 }
 
 fn _review() bool {
-    const cc = @tagName (@intToEnum (Class_t, character.class));
-    const cr = @tagName (@intToEnum (Common_Race_t, character.race));
-    stdout.print ("\n=== Character Sheet ===\nClass:\t{}\nRace:\t{}\nLevel:\t{}\n", .{cc, cr, character.level}) catch return false;
+    const cc = @tagName(@intToEnum(Class_t, character.class));
+    const cr = @tagName(@intToEnum(Common_Race_t, character.race));
+    stdout.print("\n=== Character Sheet ===\nClass:\t{}\nRace:\t{}\nLevel:\t{}\n", .{ cc, cr, character.level }) catch return false;
 
-    stdout.print ("\n= Stats =\n", .{}) catch return false;
+    stdout.print("\n= Stats =\n", .{}) catch return false;
     for (character.stats) |it, n| {
-        const tn = @tagName (@intToEnum (Base_Stat_t, @truncate (u8, n)));
-        stdout.print ("{}:\t{}\n", .{tn, it}) catch return false;
+        const tn = @tagName(@intToEnum(Core_Stat_t, @truncate(u8, n)));
+        stdout.print("{}:\t{}\n", .{ tn, it }) catch return false;
     }
     return false;
 }
@@ -63,6 +123,8 @@ const sections = [_]fn () bool{
     _pick_class,
     _pick_race,
     _pick_level,
+    _pick_base_stats,
+    _reorder_base_stats,
     _review,
 };
 
@@ -70,6 +132,8 @@ const sectionNames = [_][]const u8{
     "Class",
     "Race",
     "Starting Level",
+    "Core Stats",
+    "Reorder Core Stats",
     "Review",
 };
 
@@ -78,11 +142,10 @@ fn valid_character() bool {
     for (character.stats) |it| {
         total += it;
     }
-    return total > 4*6 and character.level > 0;
+    return total > 4 * 6 and character.level > 0;
 }
 
 pub fn main() !void {
-    const rng = std.rand.DefaultPrng.init(@intCast(u64, std.time.milliTimestamp()));
     try stdout.print("hi welcome to gert's character creator.\n", .{});
 
     var quitting: bool = false;
@@ -94,14 +157,14 @@ pub fn main() !void {
             try stdout.print("{}. {}\n", .{ n + 1, it });
         }
 
-        var select = pick_a_number (sections.len) catch |x| {
+        var select = pick_a_number(sections.len) catch |x| {
             if (x == PickError.QUIT) {
                 break;
             }
             return x;
         };
 
-        while (sections [select]()) {
+        while (sections[select]()) {
             select += 1;
             if (reviewMode or select >= sections.len) {
                 break;

@@ -65,7 +65,7 @@ pub const raceLinks = [_][]const u8{
 
 const assert = @import("std").testing.expect;
 
-pub const Base_Stat_t = enum(u8) {
+pub const Core_Stat_t = enum(u8) {
     Strength,
     Dexterity,
     Constitution,
@@ -74,7 +74,7 @@ pub const Base_Stat_t = enum(u8) {
     Charisma,
 };
 
-pub const Base_Stat_Len = @typeInfo(Base_Stat_t).Enum.fields.len;
+pub const Base_Stat_Len = @typeInfo(Core_Stat_t).Enum.fields.len;
 
 test "lengths match" {
     assert(@typeInfo(Class_t).Enum.fields.len == classLinks.len);
