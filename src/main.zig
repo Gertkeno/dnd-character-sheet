@@ -13,7 +13,7 @@ var character: struct {
 } = .{};
 
 fn _pick_class() bool {
-    stdout.print("Please pick a class\n", .{}) catch return false;
+    stdout.print("\nPlease pick a class\n", .{}) catch return false;
     for (classLinks) |it, n| {
         const asInt = @truncate(u8, n);
         const t = @tagName(@intToEnum(Class_t, asInt));
@@ -25,7 +25,7 @@ fn _pick_class() bool {
 }
 
 fn _pick_race() bool {
-    stdout.print("Pick a race\n", .{}) catch return false;
+    stdout.print("\nPick a race\n", .{}) catch return false;
     for (raceLinks) |it, n| {
         const asInt = @truncate(u8, n);
         const t = @tagName(@intToEnum(Common_Race_t, asInt));
@@ -37,15 +37,18 @@ fn _pick_race() bool {
 }
 
 fn _pick_level() bool {
-    stdout.print("Enter starting level\n", .{}) catch return false;
+    stdout.print("\nEnter starting level\n", .{}) catch return false;
     character.level = pick_a_number(255) catch return false;
     return true;
 }
 
+/// roll 4d6, remove the lowest
+/// just to populate the character's stats, ordering is later
 fn _pick_base_stats() bool {
     var rng = std.rand.DefaultPrng.init(@intCast(u64, std.time.milliTimestamp())).random;
     var totals: [6]u8 = undefined;
 
+    stdout.print("\nRolling 4d6 per stat...\n", .{}) catch return false;
     for (totals) |*tstat| {
         stdout.print("rolled: ", .{}) catch return false;
         var stubRolls: [4]u8 = [4]u8{ 0, 0, 0, 0 };
@@ -54,7 +57,7 @@ fn _pick_base_stats() bool {
         var lowest: u8 = 6;
         for (stubRolls) |*it| {
             it.* = rng.uintLessThan(u8, 6) + 1;
-            stdout.print("{},", .{it.*}) catch return false;
+            stdout.print("{}, ", .{it.*}) catch return false;
             total += it.*;
             if (it.* < lowest) {
                 lowest = it.*;
@@ -65,11 +68,12 @@ fn _pick_base_stats() bool {
         tstat.* = total - lowest;
     }
     character.stats = totals;
-    stdout.print("Assigning stats in that order, please reorder manually!\n\n", .{}) catch return false;
+    stdout.print("Assigning stats in that order, please reorder manually!\n", .{}) catch return false;
 
     return true;
 }
 
+// for std.sort.sort
 fn gr(comptime T: type, l: T, r: T) bool {
     return l > r;
 }
@@ -84,7 +88,7 @@ fn _reorder_base_stats() bool {
     for (cstats) |t| {
         // backup incase slot is take/failed choice
         while (true) {
-            stdout.print("placing stat: {}...\n", .{t}) catch return false;
+            stdout.print("\nplacing stat: {}...\n", .{t}) catch return false;
             for (pickableStat) |ps, n| {
                 const tn = @tagName(@intToEnum(Core_Stat_t, @truncate(u8, n)));
                 stdout.print("{c}. {}\n", .{ if (ps) '0' + @intCast(u8, n) + 1 else 'x', tn }) catch return false;
@@ -140,13 +144,16 @@ const sectionNames = [_][]const u8{
 fn valid_character() bool {
     var total: usize = 0;
     for (character.stats) |it| {
+        if (it < 3) {
+            return false;
+        }
         total += it;
     }
-    return total > 4 * 6 and character.level > 0;
+    return total > 3 * 6 and character.level > 0;
 }
 
 pub fn main() !void {
-    try stdout.print("hi welcome to gert's character creator.\n", .{});
+    try stdout.print("hi welcome to gert's character creator. start by typing 1. >:(\n", .{});
 
     var quitting: bool = false;
     var reviewMode: bool = false;
