@@ -1,4 +1,4 @@
-usingnamespace @import ("data.zig");
+usingnamespace @import("data.zig");
 
 pub const Character = struct {
     class: u8 = 0,
@@ -11,7 +11,7 @@ pub const Character = struct {
     maxHealth: i32 = 0,
 
     pub fn get_modifier(self: @This(), s: Core_Stat_t) i32 {
-        return coreStatModifier[self.stats[@enumToInt(s)]];
+        return core_stat_modifier(self.stats[@enumToInt(s)]);
     }
 
     pub fn get_skill_bonus(self: @This(), s: Skill_t) i32 {

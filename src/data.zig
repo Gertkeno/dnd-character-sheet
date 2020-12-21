@@ -109,9 +109,9 @@ pub const Core_Stat_t = enum(u8) {
     Charisma,
 };
 
-pub const coreStatModifier = [_]i8{
-    -5, -4, -4, -4, -3 - 3, -2, -2, -1, -1, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5,
-};
+pub fn core_stat_modifier(base: u8) i32 {
+    return @divFloor(@intCast(i32, base) - 10, 2);
+}
 
 pub fn get_proficiency_bonus(level: u8) i32 {
     if (level > 20)

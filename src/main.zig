@@ -125,7 +125,7 @@ fn _pick_max_health() bool {
         character.maxHealth += totaled;
         stdout.print("Rolled {}; adding to {} after modifiers; total {}\n", .{ roll, totaled, character.maxHealth }) catch return false;
     }
-    stdout.print("Totaled max health: {}\n", .{ character.maxHealth  }) catch return false;
+    stdout.print("Totaled max health: {}\n", .{character.maxHealth}) catch return false;
 
     return true;
 }
@@ -196,17 +196,17 @@ fn _sub_review_generic(writer: anytype) !void {
     const cr = @tagName(@intToEnum(Common_Race_t, character.race));
     try writer.print("\n=== Character Sheet ===\nClass:\t{}\t({})\nRace:\t{}\t({})\nLevel:\t{}\nMax Health:\t{}\n", .{
         cc,
-        classLinks [character.class],
+        classLinks[character.class],
         cr,
-        raceLinks [character.race],
+        raceLinks[character.race],
         character.level,
-        character.maxHealth
+        character.maxHealth,
     });
 
     try writer.print("\n= Stats =\n", .{});
     for (character.stats) |it, n| {
         const tn = @tagName(@intToEnum(Core_Stat_t, @truncate(u8, n)));
-        try writer.print("{}:\t{}({})\n", .{ tn, it, coreStatModifier[it] });
+        try writer.print("{}:\t{}({})\n", .{ tn, it, core_stat_modifier(it) });
     }
 
     const st = classSavingThrows[character.class];
@@ -279,6 +279,7 @@ pub fn main() !void {
         while (sections[select]()) {
             select += 1;
             if (character.valid_full() or select >= sections.len) {
+                _ = _review();
                 break;
             }
         }
