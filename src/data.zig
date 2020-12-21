@@ -141,7 +141,7 @@ pub const Skill_t = enum(u8) {
     Survival,
 };
 
-pub const classSkillProficiencies = [CLASS_LEN]u18{
+const classSkillProficiencies = [CLASS_LEN]u18{
     0b001000111100100100, //Artificer
     0b100000110010001010, //Barbarian
     0b111111111111111111, //Bard_
