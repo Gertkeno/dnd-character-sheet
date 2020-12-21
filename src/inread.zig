@@ -2,7 +2,7 @@ const std = @import("std");
 const stdin = std.io.getStdIn().reader();
 const stdout = std.io.getStdOut().writer();
 
-var buffer_: [1028]u8 = undefined;
+var buffer_: [256]u8 = undefined;
 
 pub fn stdin_read_line() ?[]u8 {
     const readCount = stdin.read(&buffer_) catch return null;

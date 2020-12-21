@@ -15,7 +15,9 @@ pub const Class_t = enum(u8) {
     Wizard,
 };
 
-pub const classLinks = [_][]const u8{
+const CLASS_LEN = comptime @typeInfo(Class_t).Enum.fields.len;
+
+pub const classLinks = [CLASS_LEN][]const u8{
     "http://dnd5e.wikidot.com/artificer",
     "http://dnd5e.wikidot.com/barbarian",
     "http://dnd5e.wikidot.com/bard",
@@ -32,11 +34,44 @@ pub const classLinks = [_][]const u8{
     "http://dnd5e.wikidot.com/wizard",
 };
 
-pub const Atrificer_Sub_t = enum {
-    Alchemist,
-    Armorer,
-    Artillerist,
-    Battle_Smith,
+pub const ClassHealthRoll = struct {
+    start: i8,
+    die: i8,
+    min: i8,
+};
+
+pub const classHealthRolls = [CLASS_LEN]ClassHealthRoll{
+    .{ .start = 8, .die = 8, .min = 5 }, //Artificer
+    .{ .start = 12, .die = 12, .min = 7 }, //Barbarian
+    .{ .start = 8, .die = 8, .min = 5 }, //Bard_
+    .{ .start = 8, .die = 8, .min = 5 }, //Cleric
+    .{ .start = 8, .die = 8, .min = 5 }, //Druid
+    .{ .start = 10, .die = 10, .min = 6 }, //Fighter
+    .{ .start = 8, .die = 8, .min = 5 }, //Monk
+    .{ .start = 10, .die = 10, .min = 6 }, //Paladin
+    .{ .start = 10, .die = 10, .min = 6 }, //Ranger
+    .{ .start = 8, .die = 8, .min = 5 }, //Rune_Scribe
+    .{ .start = 8, .die = 8, .min = 5 }, //Rogue
+    .{ .start = 6, .die = 6, .min = 4 }, //Sorcerer
+    .{ .start = 8, .die = 8, .min = 5 }, //Warlock
+    .{ .start = 6, .die = 6, .min = 4 }, //Wizard
+};
+
+pub const classSavingThrows = [CLASS_LEN][2]Core_Stat_t{
+    .{ Core_Stat_t.Constitution, Core_Stat_t.Intelligence }, //Artificer
+    .{ Core_Stat_t.Strength, Core_Stat_t.Constitution }, //Barbarian
+    .{ Core_Stat_t.Dexterity, Core_Stat_t.Charisma }, //Bard_
+    .{ Core_Stat_t.Wisdom_, Core_Stat_t.Charisma }, //Cleric
+    .{ Core_Stat_t.Intelligence, Core_Stat_t.Wisdom_ }, //Druid
+    .{ Core_Stat_t.Strength, Core_Stat_t.Constitution }, //Fighter
+    .{ Core_Stat_t.Strength, Core_Stat_t.Dexterity }, //Monk_
+    .{ Core_Stat_t.Wisdom_, Core_Stat_t.Charisma }, //Paladin
+    .{ Core_Stat_t.Strength, Core_Stat_t.Dexterity }, //Ranger
+    .{ Core_Stat_t.Dexterity, Core_Stat_t.Intelligence }, //Rune Scribe??
+    .{ Core_Stat_t.Dexterity, Core_Stat_t.Intelligence }, //Rogue
+    .{ Core_Stat_t.Constitution, Core_Stat_t.Charisma }, //Sorcerer
+    .{ Core_Stat_t.Wisdom_, Core_Stat_t.Charisma }, //Warlock
+    .{ Core_Stat_t.Intelligence, Core_Stat_t.Wisdom_ }, //Wizard
 };
 
 pub const Common_Race_t = enum(u8) {
@@ -74,7 +109,84 @@ pub const Core_Stat_t = enum(u8) {
     Charisma,
 };
 
-pub const Base_Stat_Len = @typeInfo(Core_Stat_t).Enum.fields.len;
+pub const coreStatModifier = [_]i8{
+    -5, -4, -4, -4, -3 - 3, -2, -2, -1, -1, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5,
+};
+
+pub fn get_proficiency_bonus(level: u8) i32 {
+    if (level > 20)
+        return 6;
+
+    return (level - 1) / 4 + 2;
+}
+
+pub const Skill_t = enum(u8) {
+    Acrobatics,
+    Animal_Handling,
+    Arcana,
+    Athletics,
+    Deception,
+    History,
+    Insight,
+    Intimidation,
+    Investigation,
+    Medicine,
+    Nature,
+    Perception,
+    Performance,
+    Persuassion,
+    Religion,
+    Slight_of_Hand,
+    Stealth,
+    Survival,
+};
+
+pub const classSkillProficiencies = [CLASS_LEN]u18{
+    0b001000111100100100, //Artificer
+    0b100000110010001010, //Barbarian
+    0b111111111111111111, //Bard_
+    0b000110001001100000, //Cleric
+    0b100100111001000110, //Druid
+    0b100000100011101011, //Fighter
+    0b010100000001101001, //Monk
+    0b000110001011001000, //Paladin
+    0b110000110101001010, //Ranger
+    0b000000000000000000, //Rune_Scribe???
+    0b011011100111011001, //Rogue
+    0b000110000011010100, //Sorcerer
+    0b000100010110110100, //Warlock
+    0b000100001101100100, //Wizard
+};
+
+pub const classSkillProficienciesCount = [CLASS_LEN]u8{
+    2, 2, 3, 2, 2, 2, 2, 2, 3, 0, 4, 2, 2, 2,
+};
+
+pub fn class_has_proficiency(c: u8, s: Skill_t) bool {
+    const bitindex = @as(u256, 1) << @enumToInt(s);
+    return classSkillProficiencies[c] & bitindex != 0;
+}
+
+pub const skillStatModifier = [_]Core_Stat_t{
+    Core_Stat_t.Dexterity,
+    Core_Stat_t.Wisdom_,
+    Core_Stat_t.Intelligence,
+    Core_Stat_t.Strength,
+    Core_Stat_t.Charisma,
+    Core_Stat_t.Intelligence,
+    Core_Stat_t.Wisdom_,
+    Core_Stat_t.Charisma,
+    Core_Stat_t.Intelligence,
+    Core_Stat_t.Wisdom_,
+    Core_Stat_t.Intelligence,
+    Core_Stat_t.Wisdom_,
+    Core_Stat_t.Charisma,
+    Core_Stat_t.Charisma,
+    Core_Stat_t.Intelligence,
+    Core_Stat_t.Dexterity,
+    Core_Stat_t.Dexterity,
+    Core_Stat_t.Wisdom_,
+};
 
 test "lengths match" {
     assert(@typeInfo(Class_t).Enum.fields.len == classLinks.len);
