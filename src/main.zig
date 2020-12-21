@@ -122,7 +122,7 @@ fn _reorder_base_stats() bool {
 
     var pickableStat: [6]bool = [_]bool{true} ** 6;
     for (cstats) |t| {
-        // backup incase slot is take/failed choice
+        // repeat if slot is taken/failed choice
         while (true) {
             stdout.print("\nplacing stat: {}...\n", .{t}) catch return false;
             for (pickableStat) |ps, n| {
@@ -167,6 +167,7 @@ fn _pick_max_health() bool {
     return true;
 }
 
+// used to detect if a proficient skill has been taken
 fn any_equal(comptime T: type, arr: []const T, val: T) bool {
     for (arr) |it| {
         if (it == val) {
