@@ -40,8 +40,7 @@ var character: struct {
     }
 
     fn valid_health(self: @This()) bool {
-        const chr = classHealthRolls[self.class];
-        return self.maxHealth > chr.min * @intCast(i32, self.level - 1) + chr.start;
+        return self.maxHealth > 0;
     }
 
     fn valid_full(self: @This()) bool {
