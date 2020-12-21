@@ -152,7 +152,7 @@ fn _pick_max_health() bool {
     const con = character.get_modifier(Core_Stat_t.Constitution);
 
     // base //
-    character.maxHealth = chr.min + con;
+    character.maxHealth = chr.start + con;
 
     stdout.print("Your Constitution modifier is {}\n", .{con}) catch return false;
     stdout.print("Starting health is {}\n", .{character.maxHealth}) catch return false;
@@ -232,7 +232,14 @@ fn _sub_review_generic(writer: anytype) !void {
 
     const cc = @tagName(@intToEnum(Class_t, character.class));
     const cr = @tagName(@intToEnum(Common_Race_t, character.race));
-    try writer.print("\n=== Character Sheet ===\nClass:\t{}\nRace:\t{}\nLevel:\t{}\nMax Health:\t{}\n", .{ cc, cr, character.level, character.maxHealth });
+    try writer.print("\n=== Character Sheet ===\nClass:\t{}\t({})\nRace:\t{}\t({})\nLevel:\t{}\nMax Health:\t{}\n", .{
+        cc,
+        classLinks [character.class],
+        cr,
+        raceLinks [character.race],
+        character.level,
+        character.maxHealth
+    });
 
     try writer.print("\n= Stats =\n", .{});
     for (character.stats) |it, n| {
