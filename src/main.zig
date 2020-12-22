@@ -1,6 +1,5 @@
 const std = @import("std");
-const stdout = std.io.getStdOut().writer();
-const stdin = std.io.getStdIn().reader();
+var stdout: *const std.fs.File.Writer = undefined;
 
 usingnamespace @import("inread.zig");
 usingnamespace @import("data.zig");
@@ -251,6 +250,9 @@ const sectionNames = [_][]const u8{
 };
 
 pub fn main() !void {
+    const lstdout = std.io.getStdOut().writer();
+    stdout = &lstdout;
+
     try stdout.print("hi welcome to gert's character creator. start by typing 1. >:(\n", .{});
     var trand = std.rand.DefaultPrng.init(@intCast(u64, std.time.milliTimestamp())).random;
     rng = &trand;
@@ -287,8 +289,10 @@ pub fn main() !void {
 
     // check if character is complete //
     if (character.valid_full()) {
+        const stdin = std.io.getStdIn().reader();
+
         var namebuffer: [1024]u8 = undefined;
-        try stdout.print("Enter a filename for the character sheet\n", .{});
+        try stdout.print("Enter a filename for the character sheet, don't forget .txt\n", .{});
         const namelen = try stdin.read(&namebuffer);
         const name: []const u8 = namebuffer[0 .. namelen - 1];
 

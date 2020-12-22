@@ -1,10 +1,9 @@
 const std = @import("std");
-const stdin = std.io.getStdIn().reader();
-const stdout = std.io.getStdOut().writer();
 
 var buffer_: [256]u8 = undefined;
 
 pub fn stdin_read_line() ?[]u8 {
+    const stdin = std.io.getStdIn().reader();
     const readCount = stdin.read(&buffer_) catch return null;
 
     if (readCount <= 1 or buffer_[readCount - 1] != '\n') {
@@ -17,6 +16,8 @@ pub fn stdin_read_line() ?[]u8 {
 pub const PickError = error{QUIT};
 
 pub fn pick_a_number(max: u8) !u8 {
+    const stdout = std.io.getStdOut().writer();
+
     outer: while (stdin_read_line()) |line| {
         if (line.len == 0 or line[0] == 'q') {
             return PickError.QUIT;
