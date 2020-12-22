@@ -43,12 +43,12 @@ fn _pick_level() bool {
 /// roll 4d6, remove the lowest
 /// just to populate the character's stats, ordering is later
 fn _pick_base_stats() bool {
-    var totals: [6]u8 = undefined;
+    var totals: [6]u8 = [_]u8{0} ** 6;
 
     stdout.print("\nRolling 4d6 per stat...\n", .{}) catch return false;
     for (totals) |*tstat| {
         stdout.print("rolled: ", .{}) catch return false;
-        var stubRolls: [4]u8 = [4]u8{ 0, 0, 0, 0 };
+        var stubRolls: [4]u8 = [_]u8{0} ** 4;
 
         var total: u8 = 0;
         var lowest: u8 = 6;
@@ -294,12 +294,13 @@ pub fn main() !void {
         var namebuffer: [1024]u8 = undefined;
         try stdout.print("Enter a filename for the character sheet, don't forget .txt\n", .{});
         const namelen = try stdin.read(&namebuffer);
-        const name: []const u8 = namebuffer[0 .. namelen - 1];
 
-        if (namelen == 0) {
-            try stdout.print("Aborting\n", .{});
+        if (namelen <= 1) {
+            try stdout.print("Aborting...\n", .{});
+            return;
         }
 
+        const name: []const u8 = namebuffer[0 .. namelen - 1];
         const dir = std.fs.cwd();
         var file = try dir.createFile(name, .{ .read = true, .exclusive = true });
         defer file.close();
