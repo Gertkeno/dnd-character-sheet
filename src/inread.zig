@@ -6,11 +6,19 @@ pub fn stdin_read_line() ?[]u8 {
     const stdin = std.io.getStdIn().reader();
     const readCount = stdin.read(&buffer_) catch return null;
 
-    if (readCount <= 1 or buffer_[readCount - 1] != '\n') {
+    // count until trailing whitespace
+    var lastChar: usize = 0;
+    for (buffer_[0..readCount]) |it, n| {
+        if (it <= 'z' and it >= '0') {
+            lastChar = n+1;
+        }
+    }
+
+    if (readCount <= 1 or lastChar == 0) {
         return null;
     }
 
-    return buffer_[0 .. readCount - 1];
+    return buffer_[0 .. lastChar];
 }
 
 pub const PickError = error{QUIT};
