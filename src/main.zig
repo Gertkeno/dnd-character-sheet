@@ -87,7 +87,11 @@ fn _reorder_base_stats() bool {
             stdout.print("\nplacing stat: {}...\n", .{t}) catch return false;
             for (pickableStat) |ps, n| {
                 const tn = @tagName(@intToEnum(Core_Stat_t, @truncate(u8, n)));
-                stdout.print("{c}. {}\n", .{ if (ps) '0' + @intCast(u8, n) + 1 else 'x', tn }) catch return false;
+                if (ps) {
+                    stdout.print("{}. {}\n", .{ n + 1, tn }) catch return false;
+                } else {
+                    stdout.print("x. {}({})\n", .{ tn, rplstats [n] }) catch return false;
+                }
             }
 
             const slot = pick_a_number(6) catch return false;
