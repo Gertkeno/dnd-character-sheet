@@ -4,8 +4,7 @@ var stdout: *const std.fs.File.Writer = undefined;
 usingnamespace @import("inread.zig");
 usingnamespace @import("data.zig");
 usingnamespace @import("character.zig");
-
-var rng: *std.rand.Random = undefined;
+usingnamespace @import("rand.zig");
 
 var character: Character = .{};
 
@@ -53,7 +52,7 @@ fn _pick_base_stats() bool {
         var total: u8 = 0;
         var lowest: u8 = 6;
         for (stubRolls) |*it| {
-            it.* = rng.uintLessThan(u8, 6) + 1;
+            it.* = @truncate (u8, rand_range (1, 7));
             stdout.print("{}, ", .{it.*}) catch return false;
             total += it.*;
             if (it.* < lowest) {
@@ -119,7 +118,7 @@ fn _pick_max_health() bool {
     stdout.print("Starting health is {}\n", .{character.maxHealth}) catch return false;
     var i: usize = 1;
     while (i < character.level) : (i += 1) {
-        const roll = rng.intRangeAtMost(i8, 1, chr.die);
+        const roll = @intCast (i32, rand_range (1, chr.die+1));
         const totaled = std.math.max(roll, chr.min) + con;
         character.maxHealth += totaled;
         stdout.print("Rolled {}; adding to {} after modifiers; total {}\n", .{ roll, totaled, character.maxHealth }) catch return false;
@@ -254,8 +253,7 @@ pub fn main() !void {
     stdout = &lstdout;
 
     try stdout.print("hi welcome to gert's character creator. start by typing 1. >:(\n", .{});
-    var trand = std.rand.DefaultPrng.init(@intCast(u64, std.time.milliTimestamp())).random;
-    rng = &trand;
+    srand (@intCast (u64, std.time.milliTimestamp()));
 
     var quitting: bool = false;
     while (!quitting) {

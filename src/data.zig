@@ -36,7 +36,7 @@ pub const classLinks = [CLASS_LEN][]const u8{
 
 pub const ClassHealthRoll = struct {
     start: i8,
-    die: i8,
+    die: u8,
     min: i8,
 };
 
