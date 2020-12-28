@@ -52,7 +52,7 @@ fn _pick_base_stats() bool {
         var total: u8 = 0;
         var lowest: u8 = 6;
         for (stubRolls) |*it| {
-            it.* = @truncate (u8, rand_range (1, 7));
+            it.* = @truncate(u8, rand_range(1, 7));
             stdout.print("{}, ", .{it.*}) catch return false;
             total += it.*;
             if (it.* < lowest) {
@@ -84,13 +84,16 @@ fn _reorder_base_stats() bool {
     for (cstats) |t| {
         // repeat if slot is taken/failed choice
         while (true) {
+            const cst = classSavingThrows[character.class];
+
             stdout.print("\nplacing stat: {}...\n", .{t}) catch return false;
+            stdout.print("Saving throws are {} and {}\n", .{ @tagName(cst[0]), @tagName(cst[1]) }) catch return false;
             for (pickableStat) |ps, n| {
                 const tn = @tagName(@intToEnum(Core_Stat_t, @truncate(u8, n)));
                 if (ps) {
                     stdout.print("{}. {}\n", .{ n + 1, tn }) catch return false;
                 } else {
-                    stdout.print("x. {}({})\n", .{ tn, rplstats [n] }) catch return false;
+                    stdout.print("x. {}({})\n", .{ tn, rplstats[n] }) catch return false;
                 }
             }
 
@@ -122,7 +125,7 @@ fn _pick_max_health() bool {
     stdout.print("Starting health is {}\n", .{character.maxHealth}) catch return false;
     var i: usize = 1;
     while (i < character.level) : (i += 1) {
-        const roll = @intCast (i32, rand_range (1, chr.die+1));
+        const roll = @intCast(i32, rand_range(1, chr.die + 1));
         const totaled = std.math.max(roll, chr.min) + con;
         character.maxHealth += totaled;
         stdout.print("Rolled {}; adding to {} after modifiers; total {}\n", .{ roll, totaled, character.maxHealth }) catch return false;
@@ -257,7 +260,7 @@ pub fn main() !void {
     stdout = &lstdout;
 
     try stdout.print("hi welcome to gert's character creator. start by typing 1. >:(\n", .{});
-    srand (@intCast (u64, std.time.milliTimestamp()));
+    srand(@intCast(u64, std.time.milliTimestamp()));
 
     var quitting: bool = false;
     while (!quitting) {

@@ -10,7 +10,7 @@ pub fn stdin_read_line() ?[]u8 {
     var lastChar: usize = 0;
     for (buffer_[0..readCount]) |it, n| {
         if (it <= 'z' and it >= '0') {
-            lastChar = n+1;
+            lastChar = n + 1;
         }
     }
 
@@ -18,7 +18,7 @@ pub fn stdin_read_line() ?[]u8 {
         return null;
     }
 
-    return buffer_[0 .. lastChar];
+    return buffer_[0..lastChar];
 }
 
 pub const PickError = error{QUIT};
