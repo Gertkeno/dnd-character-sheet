@@ -29,7 +29,7 @@ pub const Character = struct {
     }
 
     fn valid_skills(self: @This()) bool {
-        return self.skillCount > 1;
+        return self.skillCount == classSkillProficienciesCount[self.class];
     }
 
     fn valid_health(self: @This()) bool {

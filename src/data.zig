@@ -1,3 +1,6 @@
+/////////////
+// CLASSES //
+/////////////
 pub const Class_t = enum(u8) {
     Artificer,
     Barbarian,
@@ -34,13 +37,11 @@ pub const classLinks = [CLASS_LEN][]const u8{
     "http://dnd5e.wikidot.com/wizard",
 };
 
-pub const ClassHealthRoll = struct {
+pub const classHealthRolls = [CLASS_LEN]struct {
     start: i8,
     die: u8,
     min: i8,
-};
-
-pub const classHealthRolls = [CLASS_LEN]ClassHealthRoll{
+}{
     .{ .start = 8, .die = 8, .min = 5 }, //Artificer
     .{ .start = 12, .die = 12, .min = 7 }, //Barbarian
     .{ .start = 8, .die = 8, .min = 5 }, //Bard_
@@ -74,6 +75,9 @@ pub const classSavingThrows = [CLASS_LEN][2]Core_Stat_t{
     .{ Core_Stat_t.Intelligence, Core_Stat_t.Wisdom_ }, //Wizard
 };
 
+//////////
+// RACE //
+//////////
 pub const Common_Race_t = enum(u8) {
     Dragonborn,
     Dwarf,
@@ -86,7 +90,9 @@ pub const Common_Race_t = enum(u8) {
     Tiefling,
 };
 
-pub const raceLinks = [_][]const u8{
+const RACE_LEN = comptime @typeInfo(Common_Race_t).Enum.fields.len;
+
+pub const raceLinks = [RACE_LEN][]const u8{
     "http://dnd5e.wikidot.com/dragonborn",
     "http://dnd5e.wikidot.com/dwarf",
     "http://dnd5e.wikidot.com/elf",
@@ -98,8 +104,21 @@ pub const raceLinks = [_][]const u8{
     "http://dnd5e.wikidot.com/tiefling",
 };
 
-const assert = @import("std").testing.expect;
+pub const racialModifiers = [RACE_LEN][6]u8{
+    .{ 2, 0, 0, 0, 0, 1 }, // dragonbon
+    .{ 0, 0, 2, 0, 0, 0 }, // dwarf
+    .{ 0, 2, 0, 0, 0, 0 }, // elf
+    .{ 0, 0, 0, 0, 2, 0 }, // gnome
+    .{ 0, 0, 0, 0, 0, 2 }, // half-elf
+    .{ 2, 0, 1, 0, 0, 0 }, // half-orc
+    .{ 0, 2, 0, 0, 0, 0 }, // halfling
+    .{ 1, 1, 1, 1, 1, 1 }, // human
+    .{ 0, 0, 0, 0, 0, 2 }, // tiefling
+};
 
+////////////////
+// CORE STATS //
+////////////////
 pub const Core_Stat_t = enum(u8) {
     Strength,
     Dexterity,
@@ -120,6 +139,9 @@ pub fn get_proficiency_bonus(level: u8) i32 {
     return (level - 1) / 4 + 2;
 }
 
+///////////////////////
+// PROFICIENT SKILLS //
+///////////////////////
 pub const Skill_t = enum(u8) {
     Acrobatics,
     Animal_Handling,
@@ -140,6 +162,8 @@ pub const Skill_t = enum(u8) {
     Stealth,
     Survival,
 };
+
+const SKILL_LEN = comptime @typeInfo(Skill_t).Enum.fields.len;
 
 const classSkillProficiencies = [CLASS_LEN]u18{
     0b001000111100100100, //Artificer
@@ -167,7 +191,7 @@ pub fn class_has_proficiency(c: u8, s: Skill_t) bool {
     return classSkillProficiencies[c] & bitindex != 0;
 }
 
-pub const skillStatModifier = [_]Core_Stat_t{
+pub const skillStatModifier = [SKILL_LEN]Core_Stat_t{
     Core_Stat_t.Dexterity,
     Core_Stat_t.Wisdom_,
     Core_Stat_t.Intelligence,
@@ -187,8 +211,3 @@ pub const skillStatModifier = [_]Core_Stat_t{
     Core_Stat_t.Dexterity,
     Core_Stat_t.Wisdom_,
 };
-
-test "lengths match" {
-    assert(@typeInfo(Class_t).Enum.fields.len == classLinks.len);
-    assert(@typeInfo(Common_Race_t).Enum.fields.len == raceLinks.len);
-}

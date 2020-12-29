@@ -113,6 +113,25 @@ fn _reorder_base_stats() bool {
     return true;
 }
 
+fn _apply_racial_bonuses() bool {
+    stdout.print("\nFull racial modifiers are out of scope, consult {} for abilities and variants\n", .{raceLinks[character.race]}) catch return false;
+    stdout.print("Do you wish to apply basic racial stat modifiers?\n1. yes\n2. no\n", .{}) catch return false;
+    const confirm = pick_a_number(2) catch return false;
+    if (confirm != 0) {
+        return true;
+    }
+
+    stdout.print("{} gains ", .{@tagName(@intToEnum(Common_Race_t, character.race))}) catch return false;
+    for (racialModifiers[character.race]) |it, n| {
+        if (it == 0) continue;
+        stdout.print("+{} {}, ", .{ it, @tagName(@intToEnum(Core_Stat_t, @truncate(u8, n))) }) catch return false;
+        character.stats[n] += it;
+    }
+
+    stdout.print("\n", .{}) catch return false;
+    return true;
+}
+
 // character specific, must complete stats, class, and level //
 fn _pick_max_health() bool {
     const chr = classHealthRolls[character.class];
@@ -239,6 +258,7 @@ const sections = [_]fn () bool{
     _reorder_base_stats,
     // class specific //
     _pick_max_health,
+    _apply_racial_bonuses,
     _pick_proficient_skills,
     _review,
 };
@@ -251,6 +271,7 @@ const sectionNames = [_][]const u8{
     "Reorder Core Stats",
     // class specific //
     "Max Health",
+    "Apply Race Bonuses",
     "Proficient Skills",
     "Review",
 };
