@@ -4,7 +4,7 @@ pub const Character = struct {
     class: u8 = 0,
     race: u8 = 0,
     level: u8 = 1,
-    stats: [6]u8 = [_]u8{0} ** 6,
+    stats: [STAT_LEN]u8 = [_]u8{0} ** STAT_LEN,
     skills: [4]Skill_t = [_]Skill_t{Skill_t.Acrobatics} ** 4,
     skillCount: usize = 0,
 

@@ -42,7 +42,7 @@ fn _pick_level() bool {
 /// roll 4d6, remove the lowest
 /// just to populate the character's stats, ordering is later
 fn _pick_base_stats() bool {
-    var totals: [6]u8 = [_]u8{0} ** 6;
+    var totals: [STAT_LEN]u8 = [_]u8{0} ** STAT_LEN;
 
     stdout.print("\nRolling 4d6 per stat...\n", .{}) catch return false;
     for (totals) |*tstat| {
@@ -75,12 +75,12 @@ fn gr(comptime T: type, l: T, r: T) bool {
 }
 
 fn _reorder_base_stats() bool {
-    var cstats: [6]u8 = character.stats;
-    var rplstats: [6]u8 = character.stats;
+    var cstats: [STAT_LEN]u8 = character.stats;
+    var rplstats: [STAT_LEN]u8 = character.stats;
 
     std.sort.sort(u8, &cstats, u8, gr);
 
-    var pickableStat: [6]bool = [_]bool{true} ** 6;
+    var pickableStat: [STAT_LEN]bool = [_]bool{true} ** STAT_LEN;
     for (cstats) |t| {
         // repeat if slot is taken/failed choice
         while (true) {
@@ -97,7 +97,7 @@ fn _reorder_base_stats() bool {
                 }
             }
 
-            const slot = pick_a_number(6) catch return false;
+            const slot = pick_a_number(STAT_LEN) catch return false;
             if (pickableStat[slot]) {
                 rplstats[slot] = t;
                 pickableStat[slot] = false;
@@ -167,7 +167,7 @@ fn any_equal(comptime T: type, arr: []const T, val: T) bool {
 fn _pick_proficient_skills() bool {
     // generate array of selectable skills //
     var profSkillCount: u8 = 0;
-    var profSkills: [18]Skill_t = undefined;
+    var profSkills: [SKILL_LEN]Skill_t = undefined;
 
     inline for (skillStatModifier) |bstat, n| {
         const nskill = @intToEnum(Skill_t, n);

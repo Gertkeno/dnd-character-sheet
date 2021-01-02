@@ -18,7 +18,7 @@ pub const Class_t = enum(u8) {
     Wizard,
 };
 
-const CLASS_LEN = comptime @typeInfo(Class_t).Enum.fields.len;
+pub const CLASS_LEN = comptime @typeInfo(Class_t).Enum.fields.len;
 
 pub const classLinks = [CLASS_LEN][]const u8{
     "http://dnd5e.wikidot.com/artificer",
@@ -90,7 +90,7 @@ pub const Common_Race_t = enum(u8) {
     Tiefling,
 };
 
-const RACE_LEN = comptime @typeInfo(Common_Race_t).Enum.fields.len;
+pub const RACE_LEN = comptime @typeInfo(Common_Race_t).Enum.fields.len;
 
 pub const raceLinks = [RACE_LEN][]const u8{
     "http://dnd5e.wikidot.com/dragonborn",
@@ -128,6 +128,8 @@ pub const Core_Stat_t = enum(u8) {
     Charisma,
 };
 
+pub const STAT_LEN = comptime @typeInfo(Core_Stat_t).Enum.fields.len;
+
 pub fn core_stat_modifier(base: u8) i32 {
     return @divFloor(@intCast(i32, base) - 10, 2);
 }
@@ -163,7 +165,7 @@ pub const Skill_t = enum(u8) {
     Survival,
 };
 
-const SKILL_LEN = comptime @typeInfo(Skill_t).Enum.fields.len;
+pub const SKILL_LEN = comptime @typeInfo(Skill_t).Enum.fields.len;
 
 const classSkillProficiencies = [CLASS_LEN]u18{
     0b001000111100100100, //Artificer
